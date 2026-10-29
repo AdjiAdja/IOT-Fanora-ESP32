@@ -1,0 +1,42 @@
+# ============================================================
+# 🪭 Fanora — Contoh konfigurasi Home Assistant
+# Tempel blok ini di configuration.yaml
+# ============================================================
+
+mqtt:
+  broker: 192.168.1.10
+  port: 1883
+  username: fanora
+  password: rahasia
+  discovery: true
+  discovery_prefix: homeassistant
+
+# --- Sensor turunan (opsional) ---
+template:
+  - sensor:
+      - name: "Fanora · Kenyamanan"
+        unit_of_measurement: "°C"
+        state: >
+          {% set t = states('sensor.fanora_suhu') | float(0) %}
+          {% set h = states('sensor.fanora_kelembaban') | float(0) %}
+          {% if h > 70 %} {{ (t - 2) | round(1) }}
+          {% elif h < 30 %} {{ (t + 1) | round(1) }}
+          {% else %} {{ t }}{% endif %}
+        icon: mdi:leaf
+
+# --- Grup UI ---
+group:
+  fanora_panel:
+    name: "🪭 Fanora"
+    entities:
+      - event.fanora_tombol_1
+      - event.fanora_tombol_2
+      - event.fanora_tombol_3
+      - event.fanora_tombol_4
+      - event.fanora_tombol_5
+      - event.fanora_tombol_6
+      - event.fanora_tombol_7
+      - event.fanora_tombol_8
+      - sensor.fanora_suhu
+      - sensor.fanora_kelembaban
+      - binary_sensor.fanora_gerak
