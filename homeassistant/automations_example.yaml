@@ -1,0 +1,113 @@
+# ============================================================
+# 🪭 Fanora — 8 Contoh Automation
+# Setiap tombol fisik → aksi di Home Assistant
+# ============================================================
+
+automation:
+  # --- Tombol 1 → Lampu Ruang Tamu ---
+  - alias: "Fanora · Tombol 1 → Lampu Tamu"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_1
+    condition:
+      - condition: template
+        value_template: "{{ trigger.to_state.attributes.event_type == 'single_press' }}"
+    action:
+      - service: light.toggle
+        target:
+          entity_id: light.ruang_tamu
+    mode: single
+
+  # --- Tombol 2 → Kipas Angin ---
+  - alias: "Fanora · Tombol 2 → Kipas"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_2
+    action:
+      - service: switch.toggle
+        target:
+          entity_id: switch.kipas_angin
+    mode: single
+
+  # --- Tombol 3 → Suasana Film (scene) ---
+  - alias: "Fanora · Tombol 3 → Mode Film"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_3
+    action:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.nonton_film
+    mode: single
+
+  # --- Tombol 4 → Musik ---
+  - alias: "Fanora · Tombol 4 → Musik Santai"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_4
+    action:
+      - service: media_player.media_play_pause
+        target:
+          entity_id: media_player.ruang_tamu
+    mode: single
+
+  # --- Tombol 5 → Mode Tidur ---
+  - alias: "Fanora · Tombol 5 → Mode Tidur"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_5
+    action:
+      - service: script.mode_tidur
+    mode: single
+
+  # --- Tombol 6 → Semua Lampu Mati ---
+  - alias: "Fanora · Tombol 6 → Semua Lampu Mati"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_6
+    action:
+      - service: light.turn_off
+        target:
+          entity_id: all
+    mode: single
+
+  # --- Tombol 7 → Notifikasi HP ---
+  - alias: "Fanora · Tombol 7 → Panggil Bantuan"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_7
+    action:
+      - service: notify.mobile_app_hp_saya
+        data:
+          title: "🪭 Fanora"
+          message: "Seseorang menekan Tombol 7."
+    mode: single
+
+  # --- Tombol 8 → Toggle Semua ---
+  - alias: "Fanora · Tombol 8 → Master Switch"
+    trigger:
+      - platform: state
+        entity_id: event.fanora_tombol_8
+    action:
+      - service: switch.toggle
+        target:
+          entity_id: switch.master_listrik
+    mode: single
+
+  # --- Bonus: Motion → Lampu Malam ---
+  - alias: "Fanora · Gerak Terdeteksi → Lampu Malam"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.fanora_gerak
+        to: "on"
+    condition:
+      - condition: sun
+        after: sunset
+        before: sunrise
+    action:
+      - service: light.turn_on
+        target:
+          entity_id: light.lampu_malam
+        data:
+          brightness_pct: 30
+    mode: single
